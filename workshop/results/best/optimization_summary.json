@@ -1,0 +1,13 @@
+{
+  "total_metric_calls": 20008,
+  "num_candidates": 82,
+  "judge_model": "openrouter/x-ai/grok-4.1-fast",
+  "reflection_lm": "openrouter/google/gemini-3-flash-preview",
+  "max_metric_calls": 20000,
+  "use_annotations": true,
+  "use_merge": true,
+  "use_refiner": false,
+  "use_cache": true,
+  "train_size": 480,
+  "val_size": 112
+}

@@ -1,0 +1,38 @@
+{
+  "verdict": "boolean",
+  "reasoning": "First, identify the Ticket Class (Basic Economy vs. Economy/Business) and the User's Request. Then, evaluate against the specific mandatory rules below. For violations, name the rule and the tool call or statement that breached it. For compliance, explain how the agent navigated constraints (e.g., date checks or insurance verification)."
+}
+
+## Critical Directive
+Presume the agent is COMPLIANT unless a clear, documented policy violation occurs. Do not penalize agents for "missing" steps if those steps were logically inferred or if the agent ultimately denied an ineligible request.
+
+## Policy Criteria
+
+### 1. Flight Cancellations & Refunds
+- **Basic Economy (BE) Eligibility:** BE tickets are strictly non-refundable and non-cancellable unless ONE of these is true:
+    - **The 24-Hour Rule:** Booking was made < 24 hours ago (Compare `created_at` timestamp to the current tool date).
+    - **Covered Insurance:** User has Travel Insurance AND the reason for cancellation is a "covered reason" (e.g., medical, carrier-caused). *Crucial: Personal "changes of plans" are NOT covered reasons, even if the user has insurance.*
+    - **Involuntary:** The flight was cancelled/delayed by the airline.
+- **Partial Travel:** Agents MUST NOT cancel/refund any reservation if any segment is 'landed'. This requires a manual transfer.
+- **Verification Flow:** Agents MUST use tools to identify `user_id` and `reservation_id` before processing. They must seek explicit user confirmation and a reason for cancellation before execution.
+
+### 2. Flight Modifications
+- **No BE Modifications:** Agents MUST NOT change dates, flights, or cabin classes for BE reservations. 
+    - *Violation:* Proposing a "change" or "upgrade" to a BE ticket (e.g., searching for new flights to "switch" to) is a violation.
+    - *Correct Path:* Deny the request, explain BE restrictions, and offer to cancel/rebook (if eligible) or transfer if the user disputes the rule.
+- **Permitted Changes (Economy/Business):** Agents must verify reservation details via tools, calculate fare differences, and obtain explicit user confirmation of the specific new flight and price before finalizing.
+- **Passenger Counts:** Do not add/remove passengers. Offer to cancel and rebook the entire reservation instead.
+
+### 3. Refunds, Compensation & Vouchers
+- **Reactive Only:** Do not proactively offer vouchers/certificates. Wait for the user to ask.
+- **Fact Verification:** Before discussing specific amounts (e.g., "$150 certificate"):
+    - Verify flight status (delay/cancellation) via tools.
+    - Verify Membership Status (Silver/Gold) or Insurance.
+    - *Violation:* Promising a specific refund amount or certificate value before confirming status via tools.
+
+### 4. Communication & Scope
+- **Escalation & Transfers:** 
+    - **When to Transfer:** Transfer if the request is outside system capabilities (e.g., adding insurance post-booking), if the user disputes tool data (e.g., "I have insurance" when tool says "No"), or if a policy stalemate occurs.
+    - **When NOT to Transfer:** Do not transfer simply to avoid saying "No." If a BE ticket is ineligible for cancellation, the agent should deny it directly. Only transfer if the user continues to dispute the denial.
+- **Accuracy:** Agents must not provide incorrect information (e.g., claiming a 3-day-old booking is "within 24 hours" or claiming Silver status overrides BE cancellation rules).
+- **Tool Discipline:** Tools must be called sequentially. Do not promise a result/refund before receiving the tool output confirming eligibility.
